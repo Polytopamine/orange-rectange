@@ -64,22 +64,22 @@ from operator import attrgetter
 
 #-----------------------------------------------------------
 
-E = 210000
-A = 100
-L = 15000
+E = 200000
+A = 10000
+L = 5000
 F = 100
 
 #        ID , force, displacement --> None if unknown
 N0 = Node(0 , None, 0)
 N1 = Node(1 , 0, None)
-N2 = Node(2 , F, None)
-N3 = Node(3 , None, 1)
-N4 = Node(4 , 2*F, None)
+N2 = Node(2 , F,    None)
+# N3 = Node(3 , None, 1)
+# N4 = Node(4 , 2*F,  5)
 
 
 #           ID , nodes(list) , A , E , L
-E0 = QuadraticElement(0 , [N0 , N1 , N2], 2*A , E , L )
-E1 = QuadraticElement(0 , [N2 , N3 , N4], 2*A , E , L )
+E0 = QuadraticElement(0 , [N0 , N1 , N2], A , E , L )
+# E1 = QuadraticElement(0 , [N2 , N3 , N4], 2*A , E , L )
 
 
 # E1 = LinearElement(1 , N1 , N2 , 2*A , 2*E , L )
@@ -156,13 +156,7 @@ print(D)
 
 
  
-#determine the locations of unknown displacements
 
-unwn_disp_locs = []
-for i in range(len(D)):
-    if np.isnan(D[i]) == True:
-        unwn_disp_locs.append(i)
-# print(unwn_disp_locs)
 
 #determine the locations of unknown forces
 unwn_force_locs = []
@@ -180,7 +174,7 @@ for i in range(len(F)):
 
 #try to remove lines and columns with unknown forces, 
 # by deleting them instead of constructing anoother without them
-# solving for displacement, so roving lines where the force is unknown because that would be unsolvable
+# solving for displacement, so removing lines where the force is unknown because that would be unsolvable
 
 F_m = np.delete(F, unwn_force_locs, 0)
 print('F_m')
@@ -207,15 +201,39 @@ print(D_m)
 new_disp_locs = np.delete(np.arange(len(F)), unwn_force_locs,0) # displacement was calculated from all known forces, so diplacement at unknown forces have not been found yet
 # print(np.arange(len(F)),unwn_force_locs, new_disp_locs )
 for i in range(len(new_disp_locs)):
-    # print(i)
-    # print(D_m[i])
     D[new_disp_locs[i]] = D_m[i]
 
 print('new D:')
 print(D)
+#new D seems correct accrodign to worked example 7 lecture 4
+
 
 
 #find the remaining unknown forces from the displacements
+
+#determine the locations of unknown displacements
+
+unwn_disp_locs = []
+for i in range(len(D)):
+    if np.isnan(D[i]) == True:
+        unwn_disp_locs.append(i)
+# print(unwn_disp_locs)
+
+D_m = np.delete(D, unwn_disp_locs, 0)
+print('D_m')
+print(D_m)
+K_m = np.delete(np.delete(K, unwn_disp_locs, 1), unwn_disp_locs, 0)
+print('K_m')
+print(K_m)
+
+F = np.linalg.solve(K_m, D_m)
+print('new F:')
+print(F)
+
+
+
+
+
 
 
 
