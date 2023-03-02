@@ -205,7 +205,7 @@ for i in range(len(new_disp_locs)):
 
 print('new D:')
 print(D)
-#new D seems correct accrodign to worked example 7 lecture 4
+#new D seems correct accroding to worked example 7 lecture 4
 
 
 
