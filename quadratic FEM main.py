@@ -69,24 +69,25 @@ A = 100
 L = 15000
 F = 100
 
-#        ID , force, displacement) null if unknown
+#        ID , force, displacement --> None if unknown
 N0 = Node(0 , None, 0)
 N1 = Node(1 , 0, None)
 N2 = Node(2 , F, None)
-# N3 = Node(3 , 0, 0)
-# N4 = Node(4 , 2*F, None)
+N3 = Node(3 , None, 1)
+N4 = Node(4 , 2*F, None)
 
 
 #           ID , nodes(list) , A , E , L
 E0 = QuadraticElement(0 , [N0 , N1 , N2], 2*A , E , L )
-# E1 = QuadraticElement(0 , [N2 , N3 , N4], 2*A , E , L )
-'''
-E1 = LinearElement(1 , N1 , N2 , 2*A , 2*E , L )
-E2 = LinearElement(2 , N2 , N3 , A , 2*E , L )
-E3 = LinearElement(3 , N3 , N4 , 2*A , E , L )
-E4 = LinearElement(4 , N4 , N5 , A , 2*E , 2*L )
-E5 = LinearElement(5 , N5 , N6 , 2*A , 2*E , 2*L )
-'''
+E1 = QuadraticElement(0 , [N2 , N3 , N4], 2*A , E , L )
+
+
+# E1 = LinearElement(1 , N1 , N2 , 2*A , 2*E , L )
+# E2 = LinearElement(2 , N2 , N3 , A , 2*E , L )
+# E3 = LinearElement(3 , N3 , N4 , 2*A , E , L )
+# E4 = LinearElement(4 , N4 , N5 , A , 2*E , 2*L )
+# E5 = LinearElement(5 , N5 , N6 , 2*A , 2*E , 2*L )
+
 
 
 
@@ -108,7 +109,9 @@ for i in elem_list:
 
     #create the global K matrix using the multiples
 
+
 #create base stiffness matrix from elements
+
 K = np.zeros((len(node_list),len(node_list)))
 
 for elem in elem_list:
@@ -152,44 +155,98 @@ print(D)
 
 
 
+ 
+#determine the locations of unknown displacements
 
-#determine the number of unknwon displacements
-nb_unwn_disp = 0
-for i in D:
-    if np.isnan(i) == True:
-        nb_unwn_disp += 1
+unwn_disp_locs = []
+for i in range(len(D)):
+    if np.isnan(D[i]) == True:
+        unwn_disp_locs.append(i)
+# print(unwn_disp_locs)
 
-#determine the number of unknwon forces
-nb_unwn_force = 0
-for i in F:
-    if np.isnan(i) == True:
-        nb_unwn_force += 1
-print(nb_unwn_disp, nb_unwn_force)
-
-
-#solve for the displacements first
-#remove lines that have unknown forces
-D_m = np.zeros((len(D)-nb_unwn_force,1))
-F_m = np.zeros((len(D)-nb_unwn_force,1))
-K_m = np.zeros((len(D)-nb_unwn_force,len(D)))
-
-counter = 0 # used because teh modified metricies are smaller than the original
+#determine the locations of unknown forces
+unwn_force_locs = []
 for i in range(len(F)):
+    if np.isnan(F[i]) == True:
+        unwn_force_locs.append(i)
+# print(unwn_force_locs)
+
+
+
+
+
+
+# #solve for the displacements first
+
+#try to remove lines and columns with unknown forces, 
+# by deleting them instead of constructing anoother without them
+# solving for displacement, so roving lines where the force is unknown because that would be unsolvable
+
+F_m = np.delete(F, unwn_force_locs, 0)
+print('F_m')
+print(F_m)
+K_m = np.delete(np.delete(K, unwn_force_locs, 1), unwn_force_locs, 0)
+print('K_m')
+print(K_m)
+
+
+
+
+# do matric operation to find the displacements
+
+
+D_m = np.linalg.solve(K_m, F_m)
+print('D_m:')
+print(D_m)
+
+
+# with the displacements found, find the forces by usign another matrix operation
+
+#Place the newfound displacements into the displacement matrix
+
+new_disp_locs = np.delete(np.arange(len(F)), unwn_force_locs,0) # displacement was calculated from all known forces, so diplacement at unknown forces have not been found yet
+# print(np.arange(len(F)),unwn_force_locs, new_disp_locs )
+for i in range(len(new_disp_locs)):
     # print(i)
-    # print(D[i])
-    # print(np.isnan(D[i]))
-    # print(K[i])
-    if np.isnan(F[i]) == False: 
-        
+    # print(D_m[i])
+    D[new_disp_locs[i]] = D_m[i]
 
-        D_m[counter] = D[i]
-        F_m[counter] = F[i]
-        K_m[counter] = K[i]
-        counter += 1
-        print(D_m)
-        print(F_m)
-        print(K_m)
-
-        pass
+print('new D:')
+print(D)
 
 
+#find the remaining unknown forces from the displacements
+
+
+
+
+
+
+
+####testing stuff:
+
+# print('\nK:')
+# print(K)
+# # A = K * [[True],[True],[False]]
+# # A = K [True,True,False]
+# # print(A)
+# # print(A[0,0])
+# print('\n')
+# A = np.delete(K,1,0)
+# print(A)
+# print('\n')
+# A = np.delete(K,[0,1],0)
+# print(A)
+
+# A = np.arange(25).reshape(5,5)
+# print(A)
+# print('\n')
+# A = np.delete(A,[1,1,1,1,1],0)
+# print(A)
+
+# a = [1,0,0,1,0]
+# b=[]
+# for i in range(len(a)): 
+#     if a[i] ==1 :
+#         b.append(i)
+# print(b)
