@@ -55,15 +55,12 @@ A = 100000
 L = 5000
 F = 100
 
-
 #        ID , force, displacement --> None if unknown
-
 N0 = Node(0 , None, 0)
 N1 = Node(1 , 0, None)
 N2 = Node(2 , F,    None)
 N3 = Node(3 , None, 1)
 N4 = Node(4 , 2*F,  5)
-
 
 #           ID , nodes(list) , A , E , L
 E0 = Element(0 , [N0 , N1 , N2], A , E , L )
@@ -125,18 +122,14 @@ E0 = Element(0 , [N0, N1, N2], 0.4*A , E , L )
 
 
 #find smallest stiffnessfactor of the elememts
-
 min_sf = min(elem_list , key=attrgetter('sf')).sf
 
-#find what the others are the multiple of the smallest
+#make the stiffness be a multiple of the smallest stiffness value
 for i in elem_list:
     i.k = i.k * ( i.sf / min_sf )
-
-    #create the global K matrix using the multiples of the smallest value
-
-
+    
 #create base stiffness matrix from elements
-
+#create the global K matrix using the multiples of the smallest value
 K = np.zeros((len(node_list),len(node_list)))
 
 for elem in elem_list:
@@ -144,7 +137,6 @@ for elem in elem_list:
         for j in range(len(elem.nodes)):
 
             K[elem.nodes[i].ID, elem.nodes[j].ID ] += elem.k[i,j]
-
 
 print(f'K :\n{K}')
 
@@ -159,8 +151,6 @@ D = np.zeros((len(node_list),1))
 for i in node_list:
     D[i.ID,0] = i.displacement
 print(f'\nD :\n{D}')
-
-
 
 #create the forces matrix
 F = np.zeros((len(node_list),1))
@@ -196,14 +186,12 @@ D_m = np.linalg.solve(K_m, F_m)
 
 # with the displacements found, find the forces by usign another matrix operation
 #Place the newfound displacements into the displacement matrix
-new_disp_locs = np.delete(np.arange(len(F)), unwn_force_locs,0) # displacement was calculated from all known forces, so diplacement at unknown forces have not been found yet
+# displacement was calculated from all known forces, so diplacement at unknown forces have not been found yet
+new_disp_locs = np.delete(np.arange(len(F)), unwn_force_locs,0) 
 # print(np.arange(len(F)),unwn_force_locs, new_disp_locs )
 for i in range(len(new_disp_locs)):
     D[new_disp_locs[i]] = D_m[i]
-
 print(f'\nnew D:\n{D}')
-
-
 
 
 
@@ -225,13 +213,10 @@ print(f'\nnew D:\n{D}')
 F = np.dot(K, D)
 print(f'\nnew F:\n{F}')
 
-
 #updates the displacement and force values on the nodes
 for i in node_list:
     i.displacement = D[i.ID]
     i.force = F[i.ID]
-
-
 
 
 
@@ -246,13 +231,12 @@ for i in node_list:
     print(f'Node {i.ID} = {round(i.force[0],14):e} mm') #round the value to the 14th digit 
     #then turns into scientific notation to elimintae python rounding errors
 
-
 #calculate the stress and strain in each elemenent based on the displacement at the nodes
 print('\nStress and strain in each element :')
 for i in elem_list:
-    # print(f'Elem {i.ID} :')
 
-    i.strain = np.dot(np.array([-1/i.L , 1/i.L]),np.array([i.nodes[0].displacement[0], i.nodes[len(i.nodes)-1].displacement[0]]))
+    i.strain = np.dot(np.array([-1/i.L , 1/i.L]),
+                      np.array([i.nodes[0].displacement[0], i.nodes[len(i.nodes)-1].displacement[0]]))
     print(f'\nElem {i.ID} : Strain = {i.strain:e}')
 
     i.stress = i.E * i.strain
@@ -266,4 +250,4 @@ for i in elem_list:
 # -- if both displacement and force is known, 
 # the force sill be overwritten by the calculation from the displacement
 # -- the element stress and strain are not yet checked to work properly for quadratic (works good for linear)
-#would be cool to get the displacement along the length of the quad elements
+# -- would be cool to get the displacement along the length of the quad elements
