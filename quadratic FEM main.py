@@ -7,7 +7,6 @@ goal is to make a 1D FEM solver that uses quadratic elemtents and can any number
 
 import numpy as np
 
-
 elem_list = []
 node_list = []
 
@@ -140,11 +139,9 @@ for elem in elem_list:
 
 print(f'K :\n{K}')
 
-
 #create stiffness matrix that takes into account the properties of the elements
 K = K*min_sf
 print(f"\nK*EA/L :\n{K}")
-
 
 #create the displacement matrix
 D = np.zeros((len(node_list),1))
@@ -161,20 +158,17 @@ print(f'\nF :\n{F}')
 
 
 
-
-
 # #solve for the displacements first
 
-#try to remove lines and columns with unknown forces, 
+#remove lines and columns with unknown forces, 
 # by deleting them instead of constructing anoother without them
-# solving for displacement, so removing lines where the force is unknown because that would be unsolvable
+# this is solving for displacement, so removing lines where the force is unknown because that would be unsolvable
 
 #determine the locations of unknown forces
 unwn_force_locs = []
 for i in range(len(F)):
     if np.isnan(F[i]) == True:
         unwn_force_locs.append(i)
-# print(unwn_force_locs)
 
 
 F_m = np.delete(F, unwn_force_locs, 0)
@@ -188,25 +182,10 @@ D_m = np.linalg.solve(K_m, F_m)
 #Place the newfound displacements into the displacement matrix
 # displacement was calculated from all known forces, so diplacement at unknown forces have not been found yet
 new_disp_locs = np.delete(np.arange(len(F)), unwn_force_locs,0) 
-# print(np.arange(len(F)),unwn_force_locs, new_disp_locs )
 for i in range(len(new_disp_locs)):
     D[new_disp_locs[i]] = D_m[i]
 print(f'\nnew D:\n{D}')
 
-
-
-#find the remaining unknown forces from the displacements
-
-# #determine the locations of unknown displacements
-# unwn_disp_locs = []
-# for i in range(len(D)):
-#     if np.isnan(D[i]) == True:
-#         unwn_disp_locs.append(i)
-# # print(unwn_disp_locs)
-
-# #create new d and f matrixes without the unknow displacement locations
-# D_m = np.delete(D, unwn_disp_locs, 0)
-# K_m = np.delete(np.delete(K, unwn_disp_locs, 1), unwn_disp_locs, 0)
 
 
 #calculate the forces from the displacements
@@ -217,7 +196,6 @@ print(f'\nnew F:\n{F}')
 for i in node_list:
     i.displacement = D[i.ID]
     i.force = F[i.ID]
-
 
 
 
@@ -251,3 +229,5 @@ for i in elem_list:
 # the force sill be overwritten by the calculation from the displacement
 # -- the element stress and strain are not yet checked to work properly for quadratic (works good for linear)
 # -- would be cool to get the displacement along the length of the quad elements
+
+
