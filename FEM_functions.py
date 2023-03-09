@@ -13,6 +13,17 @@ from operator import attrgetter
 
 def calculate_FEM(node_list, elem_list):
 
+    """
+    Function solves for the the displacement and forces at the nodes and modifies the values in the node object to reflect the new values
+    Prints all the steps taken and the different matrixes at different stages
+
+    node_list is a list of the nodes in the model, eg [Nw, Nx , Ny , Nz]
+    elem_list is a list of the elements in the model eg [Ex, Ey]
+        node_list and elem_list are lists all nodes and elements respectively and can be used if only one model is being used at a time
+
+    returns None
+    """
+
     #find smallest stiffnessfactor of the elememts
     min_sf = min(elem_list , key=attrgetter('sf')).sf
 
@@ -116,7 +127,16 @@ def calculate_FEM(node_list, elem_list):
 
 
 def find_displacement(elem, x, silent=0):
-    #use the shape function to calculate the displacement at any point along the element
+    
+    """
+    Use the shape function to calculate the displacement at any point along the element
+
+    element is the element object
+    x is the lenght in mm
+    silent == 1 supresses the print of the result
+
+    returns the displacement at x in mm
+    """
     
     if len(elem.nodes)==2: #linear element
         shape_function = np.array([1-x/elem.L, x/elem.L])
@@ -139,7 +159,14 @@ def find_displacement(elem, x, silent=0):
 
 
 def find_elem_displacement(elem):
-    #finds the dispacement at mm along the element
+
+    """
+    finds the dispacement at mm along the element
+
+    element is the name of the element object
+    
+    retrns a tuple of list of the displacement at every milimeter of the element: ([Xs], [displacements])
+    """
 
     points = []
     disps = []
@@ -154,6 +181,14 @@ def find_elem_displacement(elem):
 
 
 def find_model_displacement(elem_list):
+
+    """
+    Calculates the displacements at every mm along the list of elements
+
+    element_list is a list of the elements to be evaluated 
+
+    retrns a tuple of list of the displacement at every milimeter of the elements: ([Xs], [displacements])
+    """
 
     points = []
     disps = []
@@ -182,10 +217,19 @@ def find_model_displacement(elem_list):
 
 
 
-def graph(points, disps):
+def simple_graph(point_disp_tuple):
+
+    """
+    plots a graph for x-disp
+
+    point_disp_tuple is tuple with (points in mm, displacement@points in mm )
+
+    Returns None
+    """
+
     print('\ngraphing')
-    print(f'number of points:{len(points)}\nnumber of displacement data: {len(disps)}')
-    plt.plot(points, disps)
+    print(f'number of mm data: {len(point_disp_tuple[0])}\nnumber of displacement data: {len(point_disp_tuple[1])}')
+    plt.plot(point_disp_tuple[0], point_disp_tuple[1])
     plt.xlabel('distance (mm)')
     plt.ylabel('displacement (mm)')
     print('displaying graph')
@@ -200,7 +244,6 @@ def graph(points, disps):
 #still problems: 
 # -- if both displacement and force is known, the force sill be overwritten by the calculation from the displacement
 # -- the element stress and strain are not yet checked to work properly for quadratic (works good for linear) -- seems to be equal tho??
-# -- would be cool to get the displacement along the length of the quad elements
 # -- can only use point loads
 # -- behavior whith assigned displacement seems odd- the rest ofthe displacement still increase regardless of which nodes should be fixed
 
