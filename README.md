@@ -1,5 +1,5 @@
 # orange-rectange   
-1D quadratic FEM solver with python   
+a simple 1D quadratic and linear FEM solver with python   
 
 
 FEM_functions.py defines the functions used.   
