@@ -19,6 +19,7 @@ file in which the problem is defined and the fuctions are run to solve the probl
     Ex = Element(ID , List of nodes , Area , E , Length )
     where: 
         Ex is the name of the element object, for use in ists of nodes
+        ID is the number of the element, used for its loction in matrixes and naming it in the output
         List of nodes must contain a list of the nodes to which the element is contected, e.g.: [Nx , Ny , Nz] 
             Can contain 2 or 3 nodes to make a linear of quadratic element respectively
         Area is the area of the element in mm2
@@ -82,6 +83,15 @@ file in which the problem is defined and the fuctions are run to solve the probl
 
 '''
 
+
+
+
+
+
+
+
+
+
 #random collection of exercises and test models:
 
 
@@ -89,17 +99,17 @@ file in which the problem is defined and the fuctions are run to solve the probl
 
 
 
-
+# Using both linear and quadratic elements
 E = 200000
 A = 100000
 L = 5000
 F = 100
 
 #        ID , force, displacement --> None if unknown
-N0 = Node(0 , 0, None)
+N0 = Node(0 , F, None)
 N1 = Node(1 , None, 0)
 N2 = Node(2 , 2*F, None)
-N3 = Node(3 , -0.5*F, 0)
+N3 = Node(3 , -0.5*F, None)
 N4 = Node(4 , 0, None)
 
 #           ID , nodes(list) , A , E , L
@@ -119,13 +129,6 @@ FEM_functions.simple_graph(a)
 
 
 
-
-
-
-
-
-
-
 '''
 #worked example 7 from lecture 4:
 E = 200000  #=200*10^3N/mm2
@@ -133,7 +136,7 @@ A = 1000000 #=1m2
 L = 1000 #mm
 F = 100 #N
 N0 = Node(0, None, 0)
-N1 = Node(1, 0)
+N1 = Node(1)
 N2 = Node(2, 100)
 E0 = Element(0, [N0, N1, N2], 0.1*A , E , 5*L )
 FEM_math.calculate_FEM(node_list, elem_list)
@@ -177,11 +180,11 @@ L = 5000
 F = 100
 
 #        ID , force, displacement --> None if unknown
-N0 = Node(0 , 0, None)
+N0 = Node(0 )
 N1 = Node(1 , None, 0)
 N2 = Node(2 , 2*F,    None)
 N3 = Node(3 , None, 0)
-N4 = Node(4 , 0)
+N4 = Node(4 )
 
 #           ID , nodes(list) , A , E , L
 E0 = Element(0 , [N0 , N1 , N2], A , E , L )

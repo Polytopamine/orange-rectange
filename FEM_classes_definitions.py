@@ -14,11 +14,12 @@ class Element:
     def __init__(self , ID , nodes , A , E , L):
 
         '''
-        List of nodes must contain a list of the nodes to which the element is contected, e.g.: [Nx , Ny , Nz] 
-            Can contain 2 or 3 nodes to make a linear of quadratic element respectively
-        Area is the area of the element in mm2
-        E is the young's modulus of the element in N/mm2
-        Lenght is the length of the element in mm
+        ID is the number of the element, used for its loction in matrixes and naming it in the output  
+        List of nodes must contain a list of the nodes to which the element is contected, e.g.: [Nx , Ny , Nz]   
+            Can contain 2 or 3 nodes to make a linear of quadratic element respectively  
+        Area is the area of the element in mm2  
+        E is the young's modulus of the element in N/mm2  
+        Lenght is the length of the element in mm  
         '''
 
         self.ID = ID
@@ -37,14 +38,14 @@ class Element:
 
 
 class Node:
-    """ details info on the node"""
+    """ info on the node"""
     def __init__(self, ID , force=0, displacement=None):
 
         '''
-        ID is the number of the node, used for its loction in matrixes and naming it in the output
-        Force is the force applied to the node in N. Use None to indicate it is unknown
-        Displacement is the amount of displacement at the node in mm. Use None indicates it is unkown.
-            If force and displacement are assumed to be 0 and unkown respectively if ommited
+        ID is the number of the node, used for its loction in matrixes and naming it in the output  
+        Force is the force applied to the node in N. Use None to indicate it is unknown  
+        Displacement is the amount of displacement at the node in mm. Use None indicates it is unkown.  
+            If force and displacement are assumed to be 0 and unkown respectively if ommited  
         '''
         
         self.ID = ID

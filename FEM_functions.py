@@ -128,8 +128,7 @@ def calculate_FEM(node_list, elem_list):
 
 def find_displacement(elem, x, silent=0):
     
-    """
-    Use the shape function to calculate the displacement at any point along the element
+    """Use the shape function to calculate the displacement at any point along the element
 
     element is the element object
     x is the lenght in mm
@@ -143,7 +142,7 @@ def find_displacement(elem, x, silent=0):
         displacement_array = np.array([elem.nodes[0].displacement,elem.nodes[1].displacement])
 
     if len(elem.nodes)==3: #quadratic element
-        shape_function = np.array([1-3*x/elem.L + 2*x**2/elem.L**2 , 4*x/elem.L-4*x**2/elem.L**2 , -x/elem.L+2*x**2/elem.L**2])
+        shape_function = np.array([1 - 3*x/elem.L + 2*x**2/elem.L**2 , 4*x/elem.L - 4*x**2/elem.L**2 , -x/elem.L+2*x**2/elem.L**2])
         displacement_array = np.array([elem.nodes[0].displacement,elem.nodes[1].displacement,elem.nodes[2].displacement])
     
     # print(f'shape_function:\n{shape_function}')
@@ -160,8 +159,7 @@ def find_displacement(elem, x, silent=0):
 
 def find_elem_displacement(elem):
 
-    """
-    finds the dispacement at mm along the element
+    """finds the dispacement at mm along the element
 
     element is the name of the element object
     
@@ -182,8 +180,7 @@ def find_elem_displacement(elem):
 
 def find_model_displacement(elem_list):
 
-    """
-    Calculates the displacements at every mm along the list of elements
+    """Calculates the displacements at every mm along the list of elements
 
     element_list is a list of the elements to be evaluated 
 
@@ -219,8 +216,7 @@ def find_model_displacement(elem_list):
 
 def simple_graph(point_disp_tuple):
 
-    """
-    plots a graph for x-disp
+    """plots a graph for x-disp
 
     point_disp_tuple is tuple with (points in mm, displacement@points in mm )
 
