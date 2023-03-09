@@ -145,6 +145,7 @@ def find_elem_displacement(elem):
     disps = []
 
     for x in range(elem.L):
+
         points.append(x)
         disps.append(find_displacement(elem, x, 1)) #use 1 to keep the funtion silent
 
@@ -157,11 +158,24 @@ def find_model_displacement(elem_list):
     points = []
     disps = []
 
-    for elem in elem_list:
-        find_elem_displacement(elem)
+    length_so_far = 0
+
+    for i in range(len(elem_list)):
+        # print(i)
+        
+        elem_points = find_elem_displacement(elem_list[i])[0]
+        elem_disps = find_elem_displacement(elem_list[i])[1]
 
 
-        pass
+        elem_points = [p+length_so_far for p in elem_points] #increase the length by value of the previous elements
+        # print(f'length added: {length_so_far}')
+
+        length_so_far += elem_list[i].L
+        points += elem_points
+        disps += elem_disps
+
+        # print(len(points))
+        # print(points)
 
     return (points, disps)
 
@@ -169,10 +183,14 @@ def find_model_displacement(elem_list):
 
 
 def graph(points, disps):
+    print('\ngraphing')
+    print(f'number of points:{len(points)}\nnumber of displacement data: {len(disps)}')
     plt.plot(points, disps)
-    plt.xlabel('distance along element (mm)')
+    plt.xlabel('distance (mm)')
     plt.ylabel('displacement (mm)')
+    print('displaying graph')
     plt.show()
+    print('graph done')
 
 
 
@@ -184,4 +202,5 @@ def graph(points, disps):
 # -- the element stress and strain are not yet checked to work properly for quadratic (works good for linear) -- seems to be equal tho??
 # -- would be cool to get the displacement along the length of the quad elements
 # -- can only use point loads
+# -- behavior whith assigned displacement seems odd- the rest ofthe displacement still increase regardless of which nodes should be fixed
 

@@ -1,7 +1,7 @@
 
 
 from FEM_classes_definitions import Node , Element , node_list , elem_list
-import FEM_math
+import FEM_functions
 
 
 
@@ -53,6 +53,30 @@ FEM_math.find_elem_displacement(E0)
 
 #other models from the different worked examples:
 
+'''
+E = 200000
+A = 100000
+L = 5000
+F = 100
+
+#        ID , force, displacement --> None if unknown
+N0 = Node(0 , 0, None)
+N1 = Node(1 , None, 0)
+N2 = Node(2 , 2*F,    None)
+N3 = Node(3 , None, 0)
+N4 = Node(4 , 0)
+
+#           ID , nodes(list) , A , E , L
+E0 = Element(0 , [N0 , N1 , N2], A , E , L )
+E1 = Element(1 , [N2 , N3 , N4], 2*A , E , L )
+
+FEM_functions.calculate_FEM([N0,N1,N2,N3,N4], [E0,E1])
+
+a=FEM_functions.find_elem_displacement(E1)
+# FEM_functions.graph(a[0],a[1])
+a=FEM_functions.find_model_displacement([E0,E1])
+FEM_functions.graph(a[0],a[1])
+'''
 
 E = 200000
 A = 100000
@@ -60,21 +84,24 @@ L = 5000
 F = 100
 
 #        ID , force, displacement --> None if unknown
-N0 = Node(0 , None, 0)
-N1 = Node(1 , 0, None)
-N2 = Node(2 , F,    None)
+N0 = Node(0 , 0, None)
+N1 = Node(1 , None, 0)
+N2 = Node(2 , 2*F, None)
 N3 = Node(3 , None, 0)
-N4 = Node(4 , 2*F)
+N4 = Node(4 , 0, None)
 
 #           ID , nodes(list) , A , E , L
-E0 = Element(0 , [N0 , N1 , N2], A , E , L )
-E1 = Element(1 , [N2 , N3 , N4], 2*A , E , L )
+E0 = Element(0 , [N0 , N1], A , E , L )
+E1 = Element(1 , [N1 , N2], A , E , L )
+E2 = Element(2 , [N2 , N3], A , E , L )
+E3 = Element(3 , [N3 , N4], A , E , L )
 
-FEM_math.calculate_FEM([N0,N1,N2,N3,N4], [E0,E1])
+# node_list = [N0,N1,N2,N3,N4]
+# elem_list = [E0,E1,E2,E3]
 
-a=FEM_math.find_elem_displacement(E1)
-FEM_math.graph(a[0],a[1])
-
+FEM_functions.calculate_FEM(node_list, elem_list)
+a=FEM_functions.find_model_displacement(elem_list)
+FEM_functions.graph(a[0],a[1])
 
 '''
 # 5.3--worked example 10
