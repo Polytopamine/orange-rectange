@@ -2,7 +2,7 @@ from FEM_classes_definitions import Node , Element , node_list , elem_list
 import FEM_functions
 
 '''
-file in which the problem is defined and the fuctions are run to solve the problem
+file in which the model of the problem is defined, and where fuctions from other files are run to solve the problem
 
 --to create a model: 
 
