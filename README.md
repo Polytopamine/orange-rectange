@@ -1,13 +1,13 @@
 # orange-rectange
 1D quadratic FEM solver with python
 
-define and run the model in the model file,
-the results and steps taken are printed into a terminal
 
-math file defines the function used to do the math.
-class definitions contains the class definitions.
-models has the different models.
+FEM_functions.py defines the functions used.
+FEM_classes_definitions.py defines the classes used.
+models.py has the different model and is the file that need to be run
 
 
-
+##### required python modules
+Requires numpy to do matrix calculations
+Requires matplotlib to graph displacements
 
