@@ -7,7 +7,7 @@ FEM_classes_definitions.py defines the classes used.
 models.py has the different model and is the file that need to be run.   
 
 
-##### required python modules   
+### required python modules   
 Requires numpy to do matrix calculations   
 Requires matplotlib to graph displacements   
 
