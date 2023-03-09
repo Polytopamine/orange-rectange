@@ -1,13 +1,13 @@
 '''
 attempt to do the FEM optional coursework
 goal is to make a 1D FEM solver that uses quadratic elemtents and can any number of displacement nodes
+this file defines the different functions that are used to solve and plot the problem
 '''
 
 
-
+from operator import attrgetter
 import numpy as np
 import matplotlib.pyplot as plt
-from operator import attrgetter
 
 
 
@@ -34,18 +34,28 @@ def calculate_FEM(node_list, elem_list):
     #create base stiffness matrix from elements
     K = np.zeros((len(node_list),len(node_list)))
 
-    #add the stifness matrixs of each of the elements
+    # add the stifness matrixs of each of the elements
     for elem in elem_list:
-        for i in range(len(elem.nodes)):
-            for j in range(len(elem.nodes)):
+        for i, node_i in enumerate(elem.nodes):
+            for j, node_j in enumerate(elem.nodes):
 
-                K[elem.nodes[i].ID, elem.nodes[j].ID ] += elem.k[i,j]
+                K[node_i.ID, node_j.ID ] += elem.k[i,j]
+
+    # print(f'K with eumeratte:\n{K}')   
+
+    # K = np.zeros((len(node_list),len(node_list)))
+    # for elem in elem_list:
+    #     for i in range(len(elem.nodes)):
+    #         for j in range(len(elem.nodes)):
+
+    #             K[elem.nodes[i].ID, elem.nodes[j].ID ] += elem.k[i,j]
 
     print(f'K :\n{K}')
 
     #create stiffness matrix that takes into account the properties of the elements by multiplying with the stifnessfactor
     K = K*min_sf
     print(f"\nK*EA/L :\n{K}")
+    print(np.shape(K))
 
     #create the displacement matrix
     D = np.zeros((len(node_list),1))
@@ -67,9 +77,10 @@ def calculate_FEM(node_list, elem_list):
 
     #determine the locations of unknown forces
     unwn_force_locs = []
-    for i in range(len(F)):
-        if np.isnan(F[i]) == True:
+    for i, F_i in enumerate(F):
+        if np.isnan(F_i) :
             unwn_force_locs.append(i)
+
 
     #remove lines and columns with unknown forces
     F_m = np.delete(F, unwn_force_locs, 0)
@@ -82,9 +93,9 @@ def calculate_FEM(node_list, elem_list):
     # with the displacements found, find the forces by usign another matrix operation
     #Place the newfound displacements into the displacement matrix
     # displacement was calculated from all known forces, so diplacement at unknown forces have not been found yet
-    new_disp_locs = np.delete(np.arange(len(F)), unwn_force_locs,0) 
-    for i in range(len(new_disp_locs)):
-        D[new_disp_locs[i]] = D_m[i]
+    new_disp_locs = np.delete(np.arange(len(F)), unwn_force_locs,0)
+    for index, location in enumerate(new_disp_locs):
+        D[location] = D_m[index]
     print(f'\nnew D:\n{D}')
 
 
@@ -115,19 +126,21 @@ def calculate_FEM(node_list, elem_list):
     for i in elem_list:
 
         i.strain = np.dot(np.array([-1/i.L , 1/i.L]),
-                        np.array([i.nodes[0].displacement[0], i.nodes[len(i.nodes)-1].displacement[0]]))
+                        np.array([i.nodes[0].displacement[0], 
+                                  i.nodes[len(i.nodes)-1].displacement[0]]))
+        
         print(f'\nElem {i.ID} Strain = {i.strain:e}')
 
         i.stress = i.E * i.strain
         print(f'Elem {i.ID} Stress = {i.stress:e} MPa')
 
-        
+     
 
 
 
 
 def find_displacement(elem, x, silent=0):
-    
+ 
     """Use the shape function to calculate the displacement at any point along the element
 
     element is the element object
@@ -136,14 +149,23 @@ def find_displacement(elem, x, silent=0):
 
     returns the displacement at x in mm
     """
-    
+
     if len(elem.nodes)==2: #linear element
-        shape_function = np.array([1-x/elem.L, x/elem.L])
-        displacement_array = np.array([elem.nodes[0].displacement,elem.nodes[1].displacement])
+        shape_function = np.array([1-x/elem.L, 
+                                   x/elem.L])
+        
+        displacement_array = np.array([elem.nodes[0].displacement,
+                                       elem.nodes[1].displacement])
+
 
     if len(elem.nodes)==3: #quadratic element
-        shape_function = np.array([1 - 3*x/elem.L + 2*x**2/elem.L**2 , 4*x/elem.L - 4*x**2/elem.L**2 , -x/elem.L+2*x**2/elem.L**2])
-        displacement_array = np.array([elem.nodes[0].displacement,elem.nodes[1].displacement,elem.nodes[2].displacement])
+        shape_function = np.array([1 - 3*x/elem.L + 2*x**2/elem.L**2 , 
+                                   4*x/elem.L - 4*x**2/elem.L**2 , 
+                                   -x/elem.L+2*x**2/elem.L**2])
+        
+        displacement_array = np.array([elem.nodes[0].displacement,
+                                       elem.nodes[1].displacement,
+                                       elem.nodes[2].displacement])
     
     # print(f'shape_function:\n{shape_function}')
     # print(f'displacement_array:\n{displacement_array}')
@@ -192,17 +214,17 @@ def find_model_displacement(elem_list):
 
     length_so_far = 0
 
-    for i in range(len(elem_list)):
+    for element in elem_list:
         # print(i)
         
-        elem_points = find_elem_displacement(elem_list[i])[0]
-        elem_disps = find_elem_displacement(elem_list[i])[1]
+        elem_points = find_elem_displacement(element)[0]
+        elem_disps = find_elem_displacement(element)[1]
 
 
         elem_points = [p+length_so_far for p in elem_points] #increase the length by value of the previous elements
         # print(f'length added: {length_so_far}')
 
-        length_so_far += elem_list[i].L
+        length_so_far += element.L
         points += elem_points
         disps += elem_disps
 
@@ -210,6 +232,9 @@ def find_model_displacement(elem_list):
         # print(points)
 
     return (points, disps)
+
+
+
 
 
 

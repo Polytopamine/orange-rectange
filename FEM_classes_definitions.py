@@ -1,10 +1,12 @@
-
+"""definitions for the Element and Node classes"""
 #FEM classes definitions
 
 import numpy as np
 
 elem_list = []
+"""list of every element that has been defined"""
 node_list = []
+"""list of every node that has been defined"""
 
 k_quadratic = np.array([[7/3, -8/3, 1/3],[-8/3, 16/3, -8/3],[1/3, -8/3, 7/3]])
 k_linear = np.array([[1,-1],[-1,1]])
