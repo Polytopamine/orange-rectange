@@ -6,11 +6,13 @@ goal is to make a 1D FEM solver that uses quadratic elemtents and can any number
 
 
 import numpy as np
+import matplotlib.pyplot as plt
 from operator import attrgetter
-# from models import node_list , elem_list
 
 
-def calculat_FEM(node_list, elem_list):
+
+def calculate_FEM(node_list, elem_list):
+
     #find smallest stiffnessfactor of the elememts
     min_sf = min(elem_list , key=attrgetter('sf')).sf
 
@@ -19,9 +21,9 @@ def calculat_FEM(node_list, elem_list):
         i.k = i.k * ( i.sf / min_sf )
         
     #create base stiffness matrix from elements
-    #create the global K matrix using the multiples of the smallest value
     K = np.zeros((len(node_list),len(node_list)))
 
+    #add the stifness matrixs of each of the elements
     for elem in elem_list:
         for i in range(len(elem.nodes)):
             for j in range(len(elem.nodes)):
@@ -30,7 +32,7 @@ def calculat_FEM(node_list, elem_list):
 
     print(f'K :\n{K}')
 
-    #create stiffness matrix that takes into account the properties of the elements
+    #create stiffness matrix that takes into account the properties of the elements by multiplying with the stifnessfactor
     K = K*min_sf
     print(f"\nK*EA/L :\n{K}")
 
@@ -49,11 +51,8 @@ def calculat_FEM(node_list, elem_list):
 
 
 
-    # #solve for the displacements first
 
-    #remove lines and columns with unknown forces, 
-    # by deleting them instead of constructing anoother without them
-    # this is solving for displacement, so removing lines where the force is unknown because that would be unsolvable
+    # solving for displacement, first removing lines where the force is unknown because that would be unsolvable
 
     #determine the locations of unknown forces
     unwn_force_locs = []
@@ -61,7 +60,7 @@ def calculat_FEM(node_list, elem_list):
         if np.isnan(F[i]) == True:
             unwn_force_locs.append(i)
 
-
+    #remove lines and columns with unknown forces
     F_m = np.delete(F, unwn_force_locs, 0)
     K_m = np.delete(np.delete(K, unwn_force_locs, 1), unwn_force_locs, 0)
 
@@ -91,13 +90,13 @@ def calculat_FEM(node_list, elem_list):
 
 
     #Display the force and dissplacement at each node
-    print('\nDissplacement at nodes:')
+    print('\nDisplacement at nodes:')
     for i in node_list:
-        print(f'Node {i.ID} = {round(i.displacement[0],14):e} mm')
+        print(f'Node {i.ID} = {round(i.displacement[0],13):e} mm')
 
     print('\nForces at nodes :')
     for i in node_list:
-        print(f'Node {i.ID} = {round(i.force[0],14):e} mm') #round the value to the 14th digit 
+        print(f'Node {i.ID} = {round(i.force[0],13):e} mm') #round the value to the 14th digit 
         #then turns into scientific notation to elimintae python rounding errors
 
     #calculate the stress and strain in each elemenent based on the displacement at the nodes
@@ -106,19 +105,83 @@ def calculat_FEM(node_list, elem_list):
 
         i.strain = np.dot(np.array([-1/i.L , 1/i.L]),
                         np.array([i.nodes[0].displacement[0], i.nodes[len(i.nodes)-1].displacement[0]]))
-        print(f'\nElem {i.ID} : Strain = {i.strain:e}')
+        print(f'\nElem {i.ID} Strain = {i.strain:e}')
 
         i.stress = i.E * i.strain
-        print(f'Elem {i.ID} : Stress = {i.stress:e} MPa')
+        print(f'Elem {i.ID} Stress = {i.stress:e} MPa')
 
         
 
 
 
-#still problem: 
-# -- if both displacement and force is known, 
-# the force sill be overwritten by the calculation from the displacement
-# -- the element stress and strain are not yet checked to work properly for quadratic (works good for linear)
-# -- would be cool to get the displacement along the length of the quad elements
 
+def find_displacement(elem, x, silent=0):
+    #use the shape function to calculate the displacement at any point along the element
+    
+    if len(elem.nodes)==2: #linear element
+        shape_function = np.array([1-x/elem.L, x/elem.L])
+        displacement_array = np.array([elem.nodes[0].displacement,elem.nodes[1].displacement])
+
+    if len(elem.nodes)==3: #quadratic element
+        shape_function = np.array([1-3*x/elem.L + 2*x**2/elem.L**2 , 4*x/elem.L-4*x**2/elem.L**2 , -x/elem.L+2*x**2/elem.L**2])
+        displacement_array = np.array([elem.nodes[0].displacement,elem.nodes[1].displacement,elem.nodes[2].displacement])
+    
+    # print(f'shape_function:\n{shape_function}')
+    # print(f'displacement_array:\n{displacement_array}')
+    
+    displacement_x = np.dot(shape_function, displacement_array )
+
+    if silent==0: #suppresses the print need be
+        print(f'displacement at {x}mm into element{elem.ID}: {round(displacement_x[0],14)} mm')
+
+    return displacement_x
+
+
+
+def find_elem_displacement(elem):
+    #finds the dispacement at mm along the element
+
+    points = []
+    disps = []
+
+    for x in range(elem.L):
+        points.append(x)
+        disps.append(find_displacement(elem, x, 1)) #use 1 to keep the funtion silent
+
+    return (points, disps)
+
+
+
+def find_model_displacement(elem_list):
+
+    points = []
+    disps = []
+
+    for elem in elem_list:
+        find_elem_displacement(elem)
+
+
+        pass
+
+    return (points, disps)
+
+
+
+
+def graph(points, disps):
+    plt.plot(points, disps)
+    plt.xlabel('distance along element (mm)')
+    plt.ylabel('displacement (mm)')
+    plt.show()
+
+
+
+
+
+
+#still problems: 
+# -- if both displacement and force is known, the force sill be overwritten by the calculation from the displacement
+# -- the element stress and strain are not yet checked to work properly for quadratic (works good for linear) -- seems to be equal tho??
+# -- would be cool to get the displacement along the length of the quad elements
+# -- can only use point loads
 
