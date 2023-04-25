@@ -1,4 +1,4 @@
-# orange-rectange   
+# 1D_Finite_Element_Analysis    
 a simple 1D quadratic and linear FEM solver with python   
 
 
