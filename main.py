@@ -100,10 +100,10 @@ import FEM_functions
 
 
 # Using both linear and quadratic elements
-E = 200000
-A = 100000
-L = 5000
-F = 100
+E = 200000  # =200*10^3N/mm2
+A = 100000 # =1m2
+L = 5000  # mm
+F = 100  # N
 
 #        ID , force, displacement --> None if unknown
 N0 = Node(0 , F, None)
