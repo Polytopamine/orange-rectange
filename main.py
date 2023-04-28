@@ -1,3 +1,4 @@
+"main file where the problem is defined and solved"
 from FEM_classes_definitions import Node , Element , node_list , elem_list
 import FEM_functions
 
