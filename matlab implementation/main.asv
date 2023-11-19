@@ -1,0 +1,38 @@
+F = 12;
+U = s
+n1 = Node(1, F, 78);
+n2 = Node(2, 2*F, 655);
+n3 = Node(3, 3*F, 13);
+
+node_list = [n1 n2 n3];
+
+
+c = Element(1,[n1 n2],45,54,7);
+c.sf;
+
+d = Element(2, [n2 n3], 10, 60, 3);
+d.sf;
+
+elem_list = [c d];
+Model(node_list, elem_list);
+
+
+% A = [1 2; 3 4];
+% disp(A)
+% disp(A(1,1))
+% A(1,1) = 5;
+% disp(A)
+
+
+
+
+
+%create displacement matrix
+%create forces matrix
+
+%solve the matrixes to calculate displacement
+
+%calculate froces from displacement
+%update displacement values on the nodes
+%calculate stress and strain in teh elements based off node displacement
+
