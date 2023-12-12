@@ -99,31 +99,31 @@ import FEM_functions
 
 
 
-# Using both linear and quadratic elements
-E = 200000  # =200*10^3N/mm2
-A = 100000 # =1m2
-L = 5000  # mm
-F = 100  # N
+# # Using both linear and quadratic elements
+# E = 200000  # =200*10^3N/mm2
+# A = 100000 # =1m2
+# L = 5000  # mm
+# F = 100  # N
 
-#        ID , force, displacement --> None if unknown
-N0 = Node(0 , F, None)
-N1 = Node(1 , None, 0)
-N2 = Node(2 , 2*F, None)
-N3 = Node(3 , -0.5*F, None)
-N4 = Node(4 , 0, None)
+# #        ID , force, displacement --> None if unknown
+# N0 = Node(0 , F, None)
+# N1 = Node(1 , None, 0)
+# N2 = Node(2 , 2*F, None)
+# N3 = Node(3 , -0.5*F, None)
+# N4 = Node(4 , 0, None)
 
-#           ID , nodes(list) , A , E , L
-E0 = Element(0 , [N0 , N1], A , E , L )
-E1 = Element(1 , [N1 , N2], A , E , L )
-E2 = Element(2 , [N2 , N3, N4], A , E , 2*L )
-# E3 = Element(3 , [N3 , N4], A , E , L )
+# #           ID , nodes(list) , A , E , L
+# E0 = Element(0 , [N0 , N1], A , E , L )
+# E1 = Element(1 , [N1 , N2], A , E , L )
+# E2 = Element(2 , [N2 , N3, N4], A , E , 2*L )
+# # E3 = Element(3 , [N3 , N4], A , E , L )
 
-# node_list = [N0,N1,N2,N3,N4]
-# elem_list = [E0,E1,E2,E3]
+# # node_list = [N0,N1,N2,N3,N4]
+# # elem_list = [E0,E1,E2,E3]
 
-FEM_functions.calculate_FEM(node_list, elem_list)
-a=FEM_functions.find_model_displacement(elem_list)
-FEM_functions.simple_graph(a)
+# FEM_functions.calculate_FEM(node_list, elem_list)
+# a=FEM_functions.find_model_displacement(elem_list)
+# # FEM_functions.simple_graph(a)
 
 
 
@@ -223,22 +223,22 @@ FEM_functions.simple_graph(a)
 
 
 
-# #Tutuorial quesiton 1.10
-# E = 200000
-# A = 1000000
-# L = 1000
-# F = 100
-# #         ID, F, D
-# N0 = Node(0, None, 0)
-# N1 = Node(1, 3*F)
-# N2 = Node(2, 2*F)
-# N3 = Node(3, 1*F)
-# #            ID , nodes(list) , A , E , L
-# E0 = Element(0 , [N0, N1], 0.9*A , E , L )
-# E1 = Element(1 , [N1, N2], 0.6*A , E , L )
-# E2 = Element(2 , [N2, N3], 0.3*A , E , L )
-# FEM_functions.calculate_FEM(node_list, elem_list)
-# #results correct
+#Tutuorial quesiton 1.10
+E = 200000
+A = 1000000
+L = 1000
+F = 100
+#         ID, F, D
+N0 = Node(0, None, 0)
+N1 = Node(1, 3*F)
+N2 = Node(2, 2*F)
+N3 = Node(3, 1*F)
+#            ID , nodes(list) , A , E , L
+E0 = Element(0 , [N0, N1], 0.9*A , E , L )
+E1 = Element(1 , [N1, N2], 0.6*A , E , L )
+E2 = Element(2 , [N2, N3], 0.3*A , E , L )
+FEM_functions.calculate_FEM(node_list, elem_list)
+#results correct
 
 
 

@@ -55,7 +55,7 @@ def calculate_FEM(node_list, elem_list):
     #create stiffness matrix that takes into account the properties of the elements by multiplying with the stifnessfactor
     K = K*min_sf
     print(f"\nK*EA/L :\n{K}")
-    print(np.shape(K))
+    # print(np.shape(K))
 
     #create the displacement matrix
     D = np.zeros((len(node_list),1))
@@ -85,9 +85,12 @@ def calculate_FEM(node_list, elem_list):
     #remove lines and columns with unknown forces
     F_m = np.delete(F, unwn_force_locs, 0)
     K_m = np.delete(np.delete(K, unwn_force_locs, 1), unwn_force_locs, 0)
-
+    print(f'\nF_m:\n{F_m}')
+    print(f'\nK_m:\n{K_m}')
     # do matric operation to find the displacements
     D_m = np.linalg.solve(K_m, F_m)
+    print(f'\nD_m:\n{D_m}')
+    
 
 
     # with the displacements found, find the forces by usign another matrix operation
@@ -119,7 +122,7 @@ def calculate_FEM(node_list, elem_list):
     print('\nForces at nodes :')
     for i in node_list:
         print(f'Node {i.ID} = {round(i.force[0],13):e} mm') #round the value to the 14th digit 
-        #then turns into scientific notation to elimintae python rounding errors
+        #then turns into scientific notation to elimintae python rounding errors if close to 0
 
     #calculate the stress and strain in each elemenent based on the displacement at the nodes
     print('\nStress and strain in each element :')

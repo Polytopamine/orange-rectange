@@ -9,10 +9,10 @@ classdef Model
         K  % stiffness matrix
         D  % displacement matrix
         F  % forces matrix
-        unwn_force_locs
+        unwn_forces_vec % logical vector of the locations of unknown forces
         F_m  % modified forces matrix, without the unknowns
         K_m  % modified stiffness matrix, without the unknowns
-        D_m
+        D_m  % modified displacement matrix, without the unknowns
     end
 
     methods
@@ -32,19 +32,17 @@ classdef Model
 
             % turn the stiffnesses of the elements into multiples of the
             %  smallest sf
-            for i = elem_list
-                i.k = i.k * (i.sf / obj.min_sf);
+            for i = 1:length(obj.elem_list)
+                obj.elem_list(i).k = obj.elem_list(i).k * (obj.elem_list(i).sf /obj.min_sf);
             end
 
             % create an empty stiffness matrix for the elements
             %  using the node list
             obj.K = zeros(length(obj.node_list),length(obj.node_list));
-            disp(obj.K)
 
             % add the sf of each elements using the node ids as the
             %  coordinates in the matrix
             for elem = obj.elem_list
-                disp(elem)
                 for i = 1:length(elem.nodes)
                     node_i = elem.nodes(i);
                     for j = 1:length(elem.nodes)
@@ -53,6 +51,7 @@ classdef Model
                     end
                 end
             end
+            disp('K:')
             disp(obj.K)
 
 
@@ -60,65 +59,84 @@ classdef Model
             % create stiffness matrix using the physical properties of the
             %  element materials
             obj.K = obj.K*obj.min_sf;
+            disp('K:')
             disp(obj.K)
-
 
 
             % create displacement matrix
             obj.D = zeros(length(obj.node_list),1);
-            disp(obj.D)
             for node_i = obj.node_list
                 obj.D(node_i.ID) = node_i.displacement;
             end
+            disp("D:")
             disp(obj.D)
 
             % create forces matrix
             obj.F = zeros(length(obj.node_list),1);
-            disp(obj.F)
             for node_i = obj.node_list
                 obj.F(node_i.ID) = node_i.force;
             end
+            disp('F:')
             disp(obj.F)
 
-            % solve the matrixes to calculate displacement
-            % remove lines where the forces are unknown
-            obj.unwn_force_locs = [];
-            for i = 1:length(obj.F)
-                F_i = obj.F(i);
-                if isnan(F_i)  % NaN is used to denote an unknown value
-                    obj.unwn_force_locs = [obj.unwn_force_locs, i];
-                end
-            end
-            disp(obj.unwn_force_locs)
+            %   solve the matrixes to calculate displacement
 
-            %             disp([isnan(obj.F)]) % vector of NaN
+            %find locaiutons of unknown forces
+            obj.unwn_forces_vec = isnan(obj.F);
+            disp('unknown_forces_vec:')
+            disp(obj.unwn_forces_vec)
+
 
             % remove lines and columns with unknown forces
-            %             disp(obj.F(obj.unwn_force_locs))
-            obj.F_m = obj.F;
-            obj.F_m(obj.unwn_force_locs) = [];
+            obj.F_m = obj.F(~obj.unwn_forces_vec);
             disp('F_m:')
             disp(obj.F_m)
 
-            obj.K_m = obj.K(~isnan(obj.F), ~isnan(obj.F));
-            %             disp('K:')
-            %             disp(obj.K)
+            obj.K_m = obj.K(~obj.unwn_forces_vec, ~obj.unwn_forces_vec);
             disp('K_m:')
             disp(obj.K_m)
 
             % Solve equation to calculate displacements
             obj.D_m = obj.K_m'*obj.F_m;
+            disp('D_m:')
             disp(obj.D_m)
 
+            obj.D_m = linsolve(obj.K_m, obj.F_m);
+            disp('D_m:')
+            disp(obj.D_m)
+            
+
+            % update the displacement matrix with the new calculated values
+            I = find(isnan(obj.D));
+            obj.D(I) = obj.D_m;
+            disp('new D:')
+            disp(obj.D)
 
 
             % calculate froces from displacement
-
-
-
+            obj.F = obj.K * obj.D;
+            disp("new F:")
+            disp(obj.F)
+ 
 
             % update displacement values on the nodes
+            for i = 1:length(obj.node_list)
+                obj.node_list(i).displacement = obj.D(i);
+            end
+
+
+
+
             % calculate stress and strain in teh elements based off node displacement
+            % /!\ uses the nodes at the end of the elem, ignoring the
+            % middle one if it is there
+            for i = 1:length(obj.elem_list)
+                l = [-1/obj.elem_list(i).L 1/obj.elem_list(i).L]
+                d = [obj.elem_list(i).nodes(1).ID
+                    obj.elem_list(i).nodes(end).ID]
+
+            end
+
 
 
 
