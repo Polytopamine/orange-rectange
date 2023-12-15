@@ -9,7 +9,9 @@ classdef Element
         E {mustBeNumeric} %mod of Elasicity
         L {mustBeNumeric} % Length
         sf {mustBeNumeric} % Stiffnes Fasctor
-        k 
+        k %stifness
+        strain
+        stress
     end
 
     methods
@@ -31,8 +33,10 @@ classdef Element
             else
                 disp('/!\ unsupported number of nodes per element')
             end
-            
+                       
         end
+
+
     end
 
 end

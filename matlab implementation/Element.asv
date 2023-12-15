@@ -6,10 +6,12 @@ classdef Element
         ID {mustBeNumeric}
         nodes
         A {mustBeNumeric} %Area
-        E {mustBeNumeric} %
-        L {mustBeNumeric}
-        sf {mustBeNumeric}
-        k 
+        E {mustBeNumeric} %mod of Elasicity
+        L {mustBeNumeric} % Length
+        sf {mustBeNumeric} % Stiffnes Fasctor
+        k %stifness
+        strain
+        stress
     end
 
     methods
@@ -31,7 +33,26 @@ classdef Element
             else
                 disp('/!\ unsupported number of nodes per element')
             end
-            
+                       
+        end
+
+        function displacement_at_x = find_displacement_at_x(obj,x)
+            %displacement_at_x:  Find the displacement at any point a x mm
+            %from the end of the element
+            %   Detailed explanation goes here
+
+            if length(obj.nodes) == 2
+                shape_function = [1-x/obj.L x/obj.L];
+                displacement_array = [obj.nodes]
+
+            end
+            if length(obj.nodes) == 3
+
+            end
+               
+
+
+            displacement_at_x = obj.min_sf + x;
         end
     end
 

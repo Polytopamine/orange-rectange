@@ -43,6 +43,10 @@ E1 = Element(2 , [N1 N2], 0.6*A , E , L );
 E2 = Element(3 , [N2 N3], 0.3*A , E , L );
 elem_list = [E0 E1 E2];
 
-Model(node_list, elem_list);
+Model1 = Model(node_list, elem_list);
+
+disp('done')
+
+a = Model1.find_displacement_at_x(1, 2)
 
 

@@ -131,9 +131,18 @@ classdef Model
             % /!\ uses the nodes at the end of the elem, ignoring the
             % middle one if it is there
             for i = 1:length(obj.elem_list)
-                l = [-1/obj.elem_list(i).L 1/obj.elem_list(i).L]
-                d = [obj.elem_list(i).nodes(1).ID
-                    obj.elem_list(i).nodes(end).ID]
+
+                l = [-1/obj.elem_list(i).L 1/obj.elem_list(i).L];
+                d = [obj.node_list(obj.elem_list(i).nodes(1).ID).displacement
+                    obj.node_list(obj.elem_list(i).nodes(end).ID).displacement];
+
+                obj.elem_list(i).strain = l*d;
+                
+
+                obj.elem_list(i).stress = obj.elem_list(i).E * obj.elem_list(i).strain;
+                disp(" - Element " + string(obj.elem_list(i).ID)+":")
+                disp("strain: " + string(obj.elem_list(i).strain))
+                disp("stress: "+ string(obj.elem_list(i).stress)+ " MPa")
 
             end
 
@@ -145,6 +154,33 @@ classdef Model
 
 
 
+        end
+
+        function displacement_at_x = find_displacement_at_x(obj, elem_ID, x)
+            %displacement_at_x:  Find the displacement at any point a x mm
+            %from the end of the element
+            %   Detailed explanation goes here
+
+            if length(obj.elem_list(elem_ID).nodes) == 2
+                disp('there are 2 nodes')
+                shape_function = [1-x/obj.elem_list(elem_ID).L x/obj.elem_list(elem_ID).L]
+                displacement_array = [obj.node_list(obj.elem_list(elem_ID).nodes(1).ID).displacement 
+                    obj.node_list(obj.elem_list(elem_ID).nodes(2).ID).displacement]
+
+                displacement_at_x = shape_function * displacement_array;
+
+
+
+
+            end
+%             if length(obj.nodes) == 3
+%                 pass 
+% 
+%             end
+               
+
+
+            displacement_at_x = obj.min_sf + x;
         end
 
         function outputArg = method1(obj,inputArg)

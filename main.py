@@ -240,7 +240,7 @@ E2 = Element(2 , [N2, N3], 0.3*A , E , L )
 FEM_functions.calculate_FEM(node_list, elem_list)
 #results correct
 
-
+FEM_functions.find_displacement(E0, 2,)
 
 
 # #tutorial quesiton 2.3
